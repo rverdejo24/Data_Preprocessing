@@ -31,7 +31,7 @@ print(product_list.describe())
 # In[3]:
 
 
-pd.isnull(product_list).count()
+pd.isnull(product_list).sum()
 
 
 # 
@@ -93,4 +93,129 @@ print(product_list.head().to_string())
 
 product_list.to_csv("cleaned_data/MotorPH_Products_List_2025_cleaned.csv", index=False)
 print(product_list.head().to_string())
+
+
+# # Product Analysis #
+
+# ## Load and read the cleaned dataset ##
+
+# In[6]:
+
+
+product_list = pd.read_csv("cleaned_data/MotorPH_Products_List_2025_cleaned.csv")
+
+
+# ## Inspect the dataset ##
+
+# In[11]:
+
+
+print(product_list.columns)
+print()
+print(product_list.shape)
+print()
+print(product_list.dtypes)
+print()
+print(product_list.nunique())
+print()
+print(product_list.info())
+print()
+print(product_list["Unit Price"].describe())
+
+
+# ## View the total number of products ##
+
+# In[12]:
+
+
+total_products = product_list["Product Name"].count()
+print(total_products)
+
+
+# ## Counts by product type ##
+
+# In[15]:
+
+
+product_type_counts = product_list.groupby("Product Type")["Product Name"].count().sort_values(ascending=False)
+print(product_type_counts)
+
+total_product_types = product_list["Product Type"].nunique()
+print(total_product_types)
+
+
+# ## Unit Price Statistics ##
+
+# In[19]:
+
+
+average_price = product_list["Unit Price"].mean()
+minimum_price = product_list["Unit Price"].min()
+maximum_price = product_list["Unit Price"].max()
+median_price = product_list["Unit Price"].median()
+
+print(f"Average Price: {average_price:,.2f}")
+print(f"Minimum Price: {minimum_price:,.2f}")
+print(f"Maximum Price: {maximum_price:,.2f}")
+print(f"Median Price: {median_price:,.2f}")
+
+
+# ## Cheapest Product ##
+
+# In[23]:
+
+
+cheapest_product = product_list.loc[product_list["Unit Price"].idxmin(),["Product Name", "Product Type", "Unit Price"]]
+print(f"Cheapest Product:\n{cheapest_product}")
+
+
+# ## Most Expensive Product ##
+
+# In[24]:
+
+
+most_expensive_product = product_list.loc[product_list["Unit Price"].idxmax(),["Product Name", "Product Type", "Unit Price"]]
+print(f"Most Expensive Product:\n{most_expensive_product}")
+
+
+# ## Total Inventory Cost ##
+
+# In[25]:
+
+
+total_inventory_cost = product_list["Unit Price"].sum()
+print(f"Total Inventory Cost: {total_inventory_cost:,.2f}")
+
+
+# ## Number of Products Acquired Each year ##
+
+# In[26]:
+
+
+acquisition_counts = product_list.groupby("Date of Acquisition")["Product Name"].count().sort_index()
+print(acquisition_counts)
+
+
+# ## Highest Acquisition Year and Count ##
+
+# In[27]:
+
+
+highest_acquisition_year = acquisition_counts.idxmax()
+highest_acquisition_count = acquisition_counts.max()
+
+print(f"Highest Acquisition Year: {highest_acquisition_year}"
+      f"\nHighest Acquisition Count: {highest_acquisition_count}")
+
+
+# ## Lowest Acquisition Year and Count ##
+
+# In[28]:
+
+
+lowest_acquisition_year = acquisition_counts.idxmin()
+lowest_acquisition_count = acquisition_counts.min()
+
+print(f"Lowest Acquisition Year: {lowest_acquisition_year}"
+      f"\nLowest Acquisition Count: {lowest_acquisition_count}")
 
