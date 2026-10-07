@@ -4,7 +4,7 @@
 # # MotorPH Product List
 # ## Loading Data Set
 
-# In[1]:
+# In[14]:
 
 
 import pandas as pd
@@ -18,7 +18,7 @@ print(product_list.head().to_string())
 
 # Check the dataset information
 
-# In[2]:
+# In[15]:
 
 
 print(product_list.info())
@@ -28,7 +28,7 @@ print(product_list.describe())
 
 # Check for missing values
 
-# In[3]:
+# In[16]:
 
 
 pd.isnull(product_list).sum()
@@ -42,11 +42,12 @@ pd.isnull(product_list).sum()
 # * Displacement (cc)
 # * Transmission.
 
-# In[4]:
+# In[17]:
 
 
 entr_no = "Product ID Number"
 prod_name = "Product Name"
+prod_brand = "Product Brand"
 entr_details = "EntrDetails"
 prod_type = "Product Type"
 engine_conf = "Engine Configuration"
@@ -57,16 +58,21 @@ mfg_year = "Date of Manufacturing"
 acquisition_date = "Date of Acquisition"
 unit_price = "Unit Price"
 
-new_columns = [entr_no, prod_name, prod_type, engine_conf, cooling_system, displacement, transmission, mfg_year, acquisition_date, unit_price]
+new_columns = [entr_no, prod_name, prod_brand, prod_type, engine_conf, cooling_system, displacement, transmission, mfg_year, acquisition_date, unit_price]
 
-split1 = product_list[entr_details].str.split("/", n=1, expand=True)
-product_list[prod_type] = split1[0].str.strip()
+name_split = product_list["EntrName"].str.split(" ", n=1, expand=True)
 
-split2 = split1[1].str.split(",", expand=True)
-product_list[engine_conf] = split2[0].str.strip()
-product_list[cooling_system] = split2[1].str.strip()
-product_list[displacement] = split2[2].str.replace("cc", "", regex=False).astype(int)
-product_list[transmission] = split2[3].str.strip()
+product_list[prod_brand] = name_split[0].str.strip()
+product_list["EntrName"] = name_split[1].str.strip()
+
+detail_split1 = product_list[entr_details].str.split("/", n=1, expand=True)
+product_list[prod_type] = detail_split1[0].str.strip()
+
+detail_split2 = detail_split1[1].str.split(",", expand=True)
+product_list[engine_conf] = detail_split2[0].str.strip()
+product_list[cooling_system] = detail_split2[1].str.strip()
+product_list[displacement] = detail_split2[2].str.replace("cc", "", regex=False).astype(int)
+product_list[transmission] = detail_split2[3].str.strip()
 
 product_list.drop(columns=[entr_details], inplace=True)
 
@@ -82,13 +88,12 @@ rename_columns("UnitPrice", unit_price)
 
 product_list = product_list[new_columns]
 
-
 print(product_list.head().to_string())
 
 
 # ## Export the cleaned data
 
-# In[5]:
+# In[18]:
 
 
 product_list.to_csv("cleaned_data/MotorPH_Products_List_2025_cleaned.csv", index=False)
@@ -99,7 +104,7 @@ print(product_list.head().to_string())
 
 # ## Load and read the cleaned dataset ##
 
-# In[6]:
+# In[19]:
 
 
 product_list = pd.read_csv("cleaned_data/MotorPH_Products_List_2025_cleaned.csv")
@@ -107,7 +112,7 @@ product_list = pd.read_csv("cleaned_data/MotorPH_Products_List_2025_cleaned.csv"
 
 # ## Inspect the dataset ##
 
-# In[11]:
+# In[20]:
 
 
 print(product_list.columns)
@@ -125,7 +130,7 @@ print(product_list["Unit Price"].describe())
 
 # ## View the total number of products ##
 
-# In[12]:
+# In[21]:
 
 
 total_products = product_list["Product Name"].count()
@@ -134,7 +139,7 @@ print(total_products)
 
 # ## Counts by product type ##
 
-# In[15]:
+# In[22]:
 
 
 product_type_counts = product_list.groupby("Product Type")["Product Name"].count().sort_values(ascending=False)
@@ -146,7 +151,7 @@ print(total_product_types)
 
 # ## Unit Price Statistics ##
 
-# In[19]:
+# In[23]:
 
 
 average_price = product_list["Unit Price"].mean()
@@ -162,7 +167,7 @@ print(f"Median Price: {median_price:,.2f}")
 
 # ## Cheapest Product ##
 
-# In[23]:
+# In[24]:
 
 
 cheapest_product = product_list.loc[product_list["Unit Price"].idxmin(),["Product Name", "Product Type", "Unit Price"]]
@@ -171,7 +176,7 @@ print(f"Cheapest Product:\n{cheapest_product}")
 
 # ## Most Expensive Product ##
 
-# In[24]:
+# In[25]:
 
 
 most_expensive_product = product_list.loc[product_list["Unit Price"].idxmax(),["Product Name", "Product Type", "Unit Price"]]
@@ -180,7 +185,7 @@ print(f"Most Expensive Product:\n{most_expensive_product}")
 
 # ## Total Inventory Cost ##
 
-# In[25]:
+# In[26]:
 
 
 total_inventory_cost = product_list["Unit Price"].sum()
@@ -189,7 +194,7 @@ print(f"Total Inventory Cost: {total_inventory_cost:,.2f}")
 
 # ## Number of Products Acquired Each year ##
 
-# In[26]:
+# In[27]:
 
 
 acquisition_counts = product_list.groupby("Date of Acquisition")["Product Name"].count().sort_index()
@@ -198,7 +203,7 @@ print(acquisition_counts)
 
 # ## Highest Acquisition Year and Count ##
 
-# In[27]:
+# In[28]:
 
 
 highest_acquisition_year = acquisition_counts.idxmax()
@@ -210,7 +215,7 @@ print(f"Highest Acquisition Year: {highest_acquisition_year}"
 
 # ## Lowest Acquisition Year and Count ##
 
-# In[28]:
+# In[29]:
 
 
 lowest_acquisition_year = acquisition_counts.idxmin()

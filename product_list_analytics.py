@@ -5,7 +5,7 @@
 
 # Load Data Set
 
-# In[30]:
+# In[1]:
 
 
 import pandas as pd
@@ -21,7 +21,7 @@ product_list.head(10)
 
 # ## Counts By Product Type ##
 
-# In[31]:
+# In[2]:
 
 
 product_type_counts = product_list.groupby("Product Type")["Product Name"].count().sort_values(ascending=False)
@@ -38,7 +38,7 @@ plt.show()
 
 # ## Price per Product ##
 
-# In[46]:
+# In[3]:
 
 
 print(product_list[["Product Name", "Unit Price"]].sort_values(by="Unit Price", ascending=False))
@@ -46,7 +46,7 @@ print(product_list[["Product Name", "Unit Price"]].sort_values(by="Unit Price", 
 
 # ## Mean, Median, and Mode comparison of Unit Price ##
 
-# In[32]:
+# In[4]:
 
 
 prices = product_list["Unit Price"]
@@ -95,7 +95,7 @@ plt.show()
 
 # ## Product Price Distribution ##
 
-# In[33]:
+# In[5]:
 
 
 plt.hist(prices, bins=10, edgecolor="black")
@@ -115,7 +115,7 @@ plt.show()
 
 # ## Units Acquired per year ##
 
-# In[38]:
+# In[6]:
 
 
 product_list["Date of Acquisition"] = product_list["Date of Acquisition"]
