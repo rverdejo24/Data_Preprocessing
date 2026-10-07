@@ -5,7 +5,7 @@
 
 # ## Loading Data Set
 
-# In[68]:
+# In[84]:
 
 
 import pandas as pd
@@ -20,7 +20,7 @@ print(sales_data.head().to_string())
 
 # ### Data Summary
 
-# In[69]:
+# In[85]:
 
 
 print("Sales Data Information")
@@ -33,11 +33,11 @@ print("Missing Values per column")
 print(pd.isnull(sales_data).sum())
 
 
-# ## Data Preprocessing
+# ## Data Preprocessing ##
 
 # Rename the columns
 
-# In[70]:
+# In[86]:
 
 
 old_date = "date"
@@ -91,7 +91,7 @@ print(sales_data.to_string())
 
 # ### Check for malformed data
 
-# In[71]:
+# In[87]:
 
 
 print("Checking malformed data in date column")
@@ -122,7 +122,7 @@ for product in sorted(sales_data[new_product_name].unique()):
 
 # ### Find and Clean the malformed dates
 
-# In[72]:
+# In[88]:
 
 
 def clean_date(value):
@@ -169,16 +169,37 @@ print(sales_data[new_date].unique())
 
 # I planned to keep the rows with NaT dates for non-time-based analysis
 
-# In[73]:
+# In[89]:
 
 
 print(sales_data[sales_data["Date"].isna()].to_string())
 
 
+# ### Create a variable for dates that are out of bounds ##
+# Third Quarter - July to September
+
+# In[90]:
+
+
+excluded_rows = sales_data.loc[
+    sales_data[new_date].isna()
+    | (sales_data[new_date] < "2025-07-01")
+    | (sales_data[new_date] >= "2025-10-01")
+].copy()
+
+
+# ### Drop the rows with dates that are out of bounds ###
+
+# In[91]:
+
+
+sales_data = sales_data.drop(excluded_rows.index)
+
+
 # ### Find the malformed product name
 # Find and clean the malformed data based on close match. Based on the previous code most malformed data ends with **x** replacing the last digit of the product name.
 
-# In[74]:
+# In[92]:
 
 
 products = sales_data[new_product_name].unique()
@@ -203,7 +224,7 @@ print(product_fixes)
 
 # ### Replaced the malformed data using the potential match
 
-# In[75]:
+# In[93]:
 
 
 sales_data[new_product_name] = sales_data[new_product_name].replace(product_fixes)
@@ -214,7 +235,7 @@ print(remaining)
 
 # ### Check if the total values are correct
 
-# In[76]:
+# In[94]:
 
 
 expected_total = sales_data[new_product_quantity] * sales_data[new_unit_price]
@@ -233,7 +254,7 @@ if wrong_values > 0:
 
 # ## Replace incorrect total values
 
-# In[77]:
+# In[95]:
 
 
 sales_data.loc[is_wrong, new_total_price] = expected_total[is_wrong]
@@ -247,13 +268,13 @@ print(f"Incorrect 'total' values found: {is_wrong_after.sum()}")
 # #### Null value handling
 # To handle the missing values in client_type, instead of dropping the affected rows, I will assign a new category "Unknown".
 
-# In[78]:
+# In[96]:
 
 
 print(sales_data[new_client_type].isnull().sum())
 
 
-# In[79]:
+# In[97]:
 
 
 sales_data[new_client_type] = sales_data[new_client_type].fillna("Unknown")
@@ -264,7 +285,7 @@ print(sales_data[new_client_type].value_counts())
 
 # Same logic applies for Payment Type
 
-# In[80]:
+# In[98]:
 
 
 sales_data[new_payment] = sales_data[new_payment].fillna("Unknown")
@@ -273,13 +294,13 @@ print(sales_data[new_payment].isnull().sum())
 print(sales_data[new_payment].value_counts())
 
 
-# In[81]:
+# In[99]:
 
 
 print(sales_data.isnull().sum())
 
 
-# In[82]:
+# In[100]:
 
 
 print(sales_data.to_string())
@@ -287,8 +308,9 @@ print(sales_data.to_string())
 
 # ## Export the cleaned sales data
 
-# In[83]:
+# In[101]:
 
 
 sales_data.to_csv("cleaned_data/MotorPH_Sales Data-3rd Quarter-Year 2025_cleaned.csv", index=False)
+excluded_rows.to_csv("cleaned_data/MotorPH_Sales Data-For QA Review.csv", index=False)
 
